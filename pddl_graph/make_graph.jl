@@ -1,4 +1,7 @@
 using PDDL
+using LightGraphs
+using GraphPlot
+using Colors
 
 # domain = load_domain("pddl_graph/pddl/blocksworld/domain.pddl")
 # problem =  load_problem("pddl_graph/pddl/blocksworld/problem.pddl")
@@ -111,6 +114,10 @@ function get_edge_pairs(tree, ids)
     return pairs, actions
 end
 
+function get_adjacency_matrix(edges, actions)
+
+end
+
 function draw_graph(tree)
     unique_states = get_unique_states(tree)
     N = length(unique_states)
@@ -123,7 +130,15 @@ function draw_graph(tree)
     print_ids(ids)
     println(actions)
 
-    
+    causal_graph = DiGraph(N)
+    for pair in edges
+        add_edge!(causal_graph, pair[1], pair[2])
+    end
+
+    label_color =
+    gplot(causal_graph, edgelabel=actions, edgelabelsize=2.0, EDGELABELSIZE=6.0, edgelabeldistx=0.5, edgelabeldisty=0.5, edgelabelc=colorant"orange", nodesize=10.0, layout=spectral_layout)
+
+
 end
 
 function print_ids(ids)
