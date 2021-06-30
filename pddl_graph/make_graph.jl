@@ -31,6 +31,9 @@ function create_causal_graph(domain, problem; max_depth=3)
             for a in A
                 s¹ = execute(a, sᵢ, domain)
                 push!(tree[i], (sᵢ, a, s¹))
+                if satisfy(problem.goal, s¹, domain)[1]
+                    return tree
+                end
             end
         end
     end
@@ -115,7 +118,7 @@ function get_edge_pairs(tree, ids)
 end
 
 
-function form_state_ids(tree)
+function get_state_ids(tree)
     unique_states = get_unique_states(tree)
     N = length(unique_states)
     ids = IdDict()
@@ -125,20 +128,54 @@ function form_state_ids(tree)
     return ids
 end
 
+function get_goal_id(problem, domain, tree)
+    ids = get_state_ids(tree)
+    goal = problem.goal
+    for (state, id) in ids
+        if satisfy(goal, state, domain)[1]
+            goal_index = id
+            return goal_index
+        end
+    end
+    println("Cannot get Goal ID")
+    return 0
+end
+
+function get_edge_action_dict(tree)
+    ids = form_state_ids(tree)
+    edges, actions = get_edge_pairs(tree, ids)
+    mapping = Dict()
+    for (e,a) in zip(edges, actions)
+        mapping[e]=a
+    end
+    return mapping
+end
+
 function draw_graph(tree)
     ids = form_state_ids(tree)
     N = length(ids)
-    edges, actions = get_edge_pairs(tree, ids)
-    actions = union(actions)
-    println(edges)
-    print_ids(ids)
-    println(actions)
+    Edges, actions = get_edge_pairs(tree, ids)
+    actions =  union(actions)
+    # println(Edges)
+    # print_ids(ids)
+    # println(actions)
     causal_graph = DiGraph(N)
-    for pair in edges
+    for pair in Edges
         add_edge!(causal_graph, pair[1], pair[2])
     end
     nodelabel = 1:nv(causal_graph)
-    gplot(causal_graph, nodelabel=nodelabel,  edgelabelsize=2.0, EDGELABELSIZE=6.0, edgelabeldistx=0.5, edgelabeldisty=0.5, edgelabel=actions, edgelabelc=colorant"orange", nodesize=10.0, layout=spectral_layout)
+    plot_edges = []
+    for e in edges(causal_graph)
+        ed = (src(e),dst(e))
+        push!(plot_edges, ed)
+    end
+    # println(plot_edges)
+    edge_labels = []
+    for p in plot_edges
+        index = findall(x->x==p, Edges)[1]
+        push!(edge_labels, actions[index])
+    end
+    gplot(causal_graph, nodelabel=nodelabel,  edgelabelsize=2.0,  edgelabeldistx=0.5, edgelabeldisty=0.5, edgelabel=edge_labels, edgelabelc=colorant"orange", nodesize=10.0, layout=spectral_layout)
 end
 
 function create_adjacency_matrix(tree)
@@ -163,6 +200,7 @@ end
 
 
 # dom, prob = get_domain_problem_objects("pddl_graph/pddl/blocksworld/domain.pddl", "pddl_graph/pddl/blocksworld/problem.pddl")
-# tree = create_causal_graph(dom, prob, max_depth=4)
+# tree = create_causal_graph(dom, prob, max_depth=3)
 # draw_graph(tree)
 # create_adjacency_matrix(tree)
+# =#
