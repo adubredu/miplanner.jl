@@ -129,6 +129,7 @@ function draw_graph(tree)
     ids = form_state_ids(tree)
     N = length(ids)
     edges, actions = get_edge_pairs(tree, ids)
+    actions = union(actions)
     println(edges)
     print_ids(ids)
     println(actions)
@@ -137,7 +138,7 @@ function draw_graph(tree)
         add_edge!(causal_graph, pair[1], pair[2])
     end
     nodelabel = 1:nv(causal_graph)
-    gplot(causal_graph, nodelabel=nodelabel, edgelabel=actions, edgelabelsize=2.0, EDGELABELSIZE=6.0, edgelabeldistx=0.5, edgelabeldisty=0.5, edgelabelc=colorant"orange", nodesize=10.0, layout=spectral_layout)
+    gplot(causal_graph, nodelabel=nodelabel,  edgelabelsize=2.0, EDGELABELSIZE=6.0, edgelabeldistx=0.5, edgelabeldisty=0.5, edgelabel=actions, edgelabelc=colorant"orange", nodesize=10.0, layout=spectral_layout)
 end
 
 function create_adjacency_matrix(tree)
@@ -161,6 +162,6 @@ function print_ids(ids)
 end
 
 dom, prob = get_domain_problem_objects("pddl_graph/pddl/blocksworld/domain.pddl", "pddl_graph/pddl/blocksworld/problem.pddl")
-tree = create_causal_graph(dom, prob, max_depth=3)
+tree = create_causal_graph(dom, prob, max_depth=4)
 draw_graph(tree)
 create_adjacency_matrix(tree)
