@@ -161,7 +161,8 @@ function print_ids(ids)
     end
 end
 
-dom, prob = get_domain_problem_objects("pddl_graph/pddl/blocksworld/domain.pddl", "pddl_graph/pddl/blocksworld/problem.pddl")
-tree = create_causal_graph(dom, prob, max_depth=4)
-draw_graph(tree)
-create_adjacency_matrix(tree)
+
+# dom, prob = get_domain_problem_objects("pddl_graph/pddl/blocksworld/domain.pddl", "pddl_graph/pddl/blocksworld/problem.pddl")
+# tree = create_causal_graph(dom, prob, max_depth=4)
+# draw_graph(tree)
+# create_adjacency_matrix(tree)
