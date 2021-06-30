@@ -114,31 +114,41 @@ function get_edge_pairs(tree, ids)
     return pairs, actions
 end
 
-function get_adjacency_matrix(edges, actions)
 
-end
-
-function draw_graph(tree)
+function form_state_ids(tree)
     unique_states = get_unique_states(tree)
     N = length(unique_states)
     ids = IdDict()
     for i=1:N
         ids[unique_states[i]] = i
     end
+    return ids
+end
+
+function draw_graph(tree)
+    ids = form_state_ids(tree)
+    N = length(ids)
     edges, actions = get_edge_pairs(tree, ids)
     println(edges)
     print_ids(ids)
     println(actions)
-
     causal_graph = DiGraph(N)
     for pair in edges
         add_edge!(causal_graph, pair[1], pair[2])
     end
+    nodelabel = 1:nv(causal_graph)
+    gplot(causal_graph, nodelabel=nodelabel, edgelabel=actions, edgelabelsize=2.0, EDGELABELSIZE=6.0, edgelabeldistx=0.5, edgelabeldisty=0.5, edgelabelc=colorant"orange", nodesize=10.0, layout=spectral_layout)
+end
 
-    label_color =
-    gplot(causal_graph, edgelabel=actions, edgelabelsize=2.0, EDGELABELSIZE=6.0, edgelabeldistx=0.5, edgelabeldisty=0.5, edgelabelc=colorant"orange", nodesize=10.0, layout=spectral_layout)
-
-
+function create_adjacency_matrix(tree)
+    ids = form_state_ids(tree)
+    N = length(ids)
+    edges, actions = get_edge_pairs(tree, ids)
+    matrix = zeros((N,N))
+    for e in edges
+        matrix[e[1],e[2]] = 1
+    end
+    return matrix
 end
 
 function print_ids(ids)
@@ -153,3 +163,4 @@ end
 dom, prob = get_domain_problem_objects("pddl_graph/pddl/blocksworld/domain.pddl", "pddl_graph/pddl/blocksworld/problem.pddl")
 tree = create_causal_graph(dom, prob, max_depth=3)
 draw_graph(tree)
+create_adjacency_matrix(tree)
