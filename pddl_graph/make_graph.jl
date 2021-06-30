@@ -178,6 +178,33 @@ function draw_graph(tree)
     gplot(causal_graph, nodelabel=nodelabel,  edgelabelsize=2.0,  edgelabeldistx=0.5, edgelabeldisty=0.5, edgelabel=edge_labels, edgelabelc=colorant"orange", nodesize=10.0, layout=spectral_layout)
 end
 
+function find_first_node(plan, node)
+    for p in plan
+        if p[1] == node
+            return p
+        end
+    end
+end
+
+function force_right_order(plan)
+    ordered_plan = []
+    first = plan[1]
+    for p in plan
+        if p[1] == 1
+            first = p
+            push!(ordered_plan, p)
+            break
+        end
+    end
+    focus = first
+    while length(ordered_plan) != length(plan)
+        node = find_first_node(plan, focus[2])
+        push!(ordered_plan, node)
+        focus = node
+    end
+    return ordered_plan
+end
+
 function create_adjacency_matrix(tree)
     ids = form_state_ids(tree)
     N = length(ids)
@@ -187,6 +214,22 @@ function create_adjacency_matrix(tree)
         matrix[e[1],e[2]] = 1
     end
     return matrix
+end
+
+function format_plan(tree, cartesian_indices)
+    action_mapping = get_edge_action_dict(tree)
+    plan_edges = []
+    plan = []
+    for ci in cartesian_indices
+        idx = (ci[1], ci[2])
+        push!(plan_edges, idx)
+    end
+    plan_edge_path = force_right_order(plan_edges)
+    for ei in plan_edge_path
+        push!(plan, action_mapping[ei])
+    end
+
+    return plan
 end
 
 function print_ids(ids)
