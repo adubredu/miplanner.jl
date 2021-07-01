@@ -142,7 +142,7 @@ function get_goal_id(problem, domain, tree)
 end
 
 function get_edge_action_dict(tree)
-    ids = form_state_ids(tree)
+    ids = get_state_ids(tree)
     edges, actions = get_edge_pairs(tree, ids)
     mapping = Dict()
     for (e,a) in zip(edges, actions)
@@ -152,7 +152,7 @@ function get_edge_action_dict(tree)
 end
 
 function draw_graph(tree)
-    ids = form_state_ids(tree)
+    ids = get_state_ids(tree)
     N = length(ids)
     Edges, actions = get_edge_pairs(tree, ids)
     actions =  union(actions)
@@ -206,7 +206,7 @@ function force_right_order(plan)
 end
 
 function create_adjacency_matrix(tree)
-    ids = form_state_ids(tree)
+    ids = get_state_ids(tree)
     N = length(ids)
     edges, actions = get_edge_pairs(tree, ids)
     matrix = zeros((N,N))
