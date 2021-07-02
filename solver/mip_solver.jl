@@ -25,7 +25,7 @@ function mip_planner(domain_path, problem_path)
     @objective(shortest_path, Min, LinearAlgebra.dot(G, x))
 
     optimize!(shortest_path)
-    # println(x)
+    
     solution = value.(x)
     cartesian_indices = findall(x->x==1, solution)
     plan = format_plan(tree, cartesian_indices, action_mapping, iid)
