@@ -1,7 +1,7 @@
 include("../pddl_graph/create_graph.jl")
 
 using JuMP
-import GLPK
+import GLPK, Gurobi
 import LinearAlgebra
 
 function mip_planner(domain_path, problem_path)
@@ -14,7 +14,8 @@ function mip_planner(domain_path, problem_path)
     G = create_adjacency_matrix(tree,pais)
     println("Setting up optimization...")
     n = size(G)[1]
-    shortest_path = Model(GLPK.Optimizer)
+    println("Decision variable matrix size: ",size(G))
+    shortest_path = Model(Gurobi.Optimizer)
 
     @variable(shortest_path, x[1:n, 1:n], Bin)
     @constraint(shortest_path, [i=1:n, j=1:n; G[i,j]==0], x[i,j]==0)
@@ -25,7 +26,7 @@ function mip_planner(domain_path, problem_path)
     @objective(shortest_path, Min, LinearAlgebra.dot(G, x))
 
     optimize!(shortest_path)
-    
+
     solution = value.(x)
     cartesian_indices = findall(x->x==1, solution)
     plan = format_plan(tree, cartesian_indices, action_mapping, iid)
