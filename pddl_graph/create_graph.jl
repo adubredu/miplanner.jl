@@ -2,6 +2,7 @@ using PDDL
 using LightGraphs
 using GraphPlot
 using Colors
+using SymbolicPlanners
 
 function get_domain_problem_objects(domain_path, problem_path)
     domain = load_domain(domain_path)
@@ -23,6 +24,23 @@ function expand!(node, tree, queue, domain, problem)
 
 end
 
+function expand_ff!(node, tree, queue, domain, problem, ff)
+    state = node[5]
+    actions = available(state, domain)
+    for act in actions
+        next_state = execute(act, state, domain)
+        next_id = hash(next_state)
+        if haskey(tree, next_id) continue end
+        tree[next_id] = (node[4], state, act, next_id, next_state)
+        next_cost = ff(domain, next_state, problem.goal)
+        if !(next_id in keys(queue))
+            enqueue!(queue, next_id, next_cost)
+        else
+            queue[next_id] = next_cost
+        end
+    end
+end
+
 function create_causal_graph(domain, problem; max_depth=10)
     init_state = initialize(problem)
     init_id = hash(init_state)
@@ -37,6 +55,26 @@ function create_causal_graph(domain, problem; max_depth=10)
             return tree
         end
         expand!(node, tree, queue, domain, problem)
+    end
+    return :Failure
+end
+
+function create_causal_graph_ff(domain, problem; max_depth=10)
+    init_state = initialize(problem)
+    init_id = hash(init_state)
+    tree = IdDict()
+    tree[init_id] = (init_id, init_state, nothing, init_id, init_state)
+    ff = precompute!(FFHeuristic(), domain, init_state, problem.goal)
+    est_cost = ff(domain, init_state, problem.goal)
+    queue = PriorityQueue{UInt, Float64}(init_id => est_cost)
+
+    for i = 1:max_depth
+        node_id = dequeue!(queue)
+        node = tree[node_id]
+        if satisfy(problem.goal, node[5], domain)[1]
+            return tree
+        end
+        expand_ff!(node, tree, queue, domain, problem, ff)
     end
     return :Failure
 end
@@ -127,7 +165,7 @@ function force_right_order(plan, iid)
         end
     end
     focus = first
-    while length(ordered_plan) != length(plan) 
+    while length(ordered_plan) != length(plan)
         node = find_first_node(plan, focus[2])
         push!(ordered_plan, node)
         focus = node

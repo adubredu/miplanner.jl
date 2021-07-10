@@ -6,7 +6,7 @@ import LinearAlgebra
 
 function mip_planner(domain_path, problem_path)
     dom, prob = get_domain_problem_objects(domain_path, problem_path)
-    tree = create_causal_graph(dom, prob, max_depth=1000000)
+    tree = create_causal_graph_ff(dom, prob, max_depth=1000000)
     pais, actions, action_mapping = get_edge_action_pairs(tree)
     gid = get_goal_id(dom, prob, tree)
     iid = get_init_id(dom, prob, tree)
