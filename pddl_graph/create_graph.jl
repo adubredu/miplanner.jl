@@ -186,3 +186,13 @@ function format_plan(tree, cartesian_indices, action_mapping, iid)
     end
     return plan
 end
+
+function draw_graph(tree)
+    Edges, actions = get_edge_action_pairs(tree)
+    N = length(tree) 
+    causal_graph = DiGraph(N)
+    for pair in Edges
+        add_edge!(causal_graph, pair[1], pair[2])
+    end
+    gplot(causal_graph,   edgelabelc=colorant"orange", nodesize=10.0)
+end
