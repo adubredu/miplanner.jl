@@ -1,0 +1,62 @@
+
+<robot name="table">
+  <link name="base">
+    <contact>
+      <lateral_friction value="1.0"/>
+    </contact>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".0"/>
+       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+				<box size="0.5 1 0.05"/>
+      </geometry>
+       <material name="brown">
+        <color rgba="0.65 0.16 0.16 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+	 	     <box size="1.5 1 0.05"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="leg">
+    <contact>
+      <lateral_friction value="1.0"/>
+    </contact>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".0"/>
+       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.05 0.05 1"/>
+      </geometry>
+       <material name="brown">
+        <color rgba="0.65 0.16 0.16 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.05 0.05 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="leg_to_top" type="fixed">
+    <parent link="leg"/>
+    <child link="base"/>
+    <origin rpy="0 0 0" xyz="0 0 0.5"/>
+  </joint>
+
+
+</robot>
