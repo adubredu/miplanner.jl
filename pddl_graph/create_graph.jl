@@ -3,6 +3,7 @@ using LightGraphs
 using GraphPlot
 using Colors
 using SymbolicPlanners
+using DataStructures
 
 function get_domain_problem_objects(domain_path, problem_path)
     domain = load_domain(domain_path)
@@ -189,7 +190,7 @@ end
 
 function draw_graph(tree)
     Edges, actions = get_edge_action_pairs(tree)
-    N = length(tree) 
+    N = length(tree)
     causal_graph = DiGraph(N)
     for pair in Edges
         add_edge!(causal_graph, pair[1], pair[2])
