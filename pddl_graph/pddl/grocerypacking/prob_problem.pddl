@@ -1,0 +1,5 @@
+(define (problem gprob)
+       (:domain grocery)
+ (:objects a b c )
+(:init (arm-empty) (on-table a) (on-table b) (on-table c) )
+(:goal (and (in-bag a) (in-bag b) (in-bag c) )))

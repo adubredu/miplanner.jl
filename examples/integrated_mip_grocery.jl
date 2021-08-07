@@ -50,3 +50,4 @@ println("items packed: ", items_packed)
 weights_packed = [weights[i] for i in items_packed]
 println("weights of items: ", weights_packed)
 println("sum weights: ", sum(weights_packed))
+actions

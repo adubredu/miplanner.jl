@@ -15,7 +15,7 @@ function mip_planner(domain_path, problem_path)
     println("Setting up optimization...")
     n = size(G)[1]
     println("Decision variable matrix size: ",size(G))
-    shortest_path = Model(Gurobi.Optimizer)
+    shortest_path = Model(GLPK.Optimizer)
 
     @variable(shortest_path, x[1:n, 1:n], Bin)
     @constraint(shortest_path, [i=1:n, j=1:n; G[i,j]==0], x[i,j]==0)
