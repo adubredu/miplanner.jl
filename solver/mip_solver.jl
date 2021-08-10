@@ -10,7 +10,7 @@ function mip_planner(domain_path, problem_path)
     pais, actions, action_mapping = get_edge_action_pairs(tree)
     gid = get_goal_id(dom, prob, tree)
     iid = get_init_id(dom, prob, tree)
-
+    println("Action mapping: ", action_mapping)
     G = create_adjacency_matrix(tree,pais)
     println("Setting up optimization...")
     n = size(G)[1]
