@@ -23,5 +23,5 @@ function create_grocery_problem(items, problem_name)
 end
 
 
-items = ["a","b", "c"]
-create_grocery_problem(items, "prob")
+# items = ["a","b", "c"]
+# create_grocery_problem(items, "prob")

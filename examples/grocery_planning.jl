@@ -37,8 +37,21 @@ iid = get_init_id(dom, prob, tree)
 println("Action mapping: ", action_mapping)
 G = create_adjacency_matrix(tree,pais)
 
-penalty = 10e10
+penalty = 999
 unpacked_items = [items[i] for i in indices_not_packed]
+println("Unpacked items: ", unpacked_items)
+for p in action_mapping
+    act = p[2]
+    if act != nothing
+        for obj in act.args
+            if obj in unpacked_items
+                G[p[1],p[2]] = penalty
+            end
+        end
+    end
+end
+
+# println(G)
 
 
 println("Setting up optimization...")
