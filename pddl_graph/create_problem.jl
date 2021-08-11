@@ -5,7 +5,7 @@ function create_grocery_problem(items, problem_name)
        prefix *= string(ob) * " "
    end
    prefix *= ")\n"
-   prefix *= "(:init (arm-empty) "
+   prefix *= "(:init  "
    for ob in items
        prefix *= "(on-table " * string(ob) * ") "
    end
