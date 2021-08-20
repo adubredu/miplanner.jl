@@ -185,7 +185,8 @@ function create_adjacency_matrix(tree, pais)
     return matrix
 end
 
-function print_id_to_state(tree, id_dict)
+function print_id_to_state(tree)
+    id_dict = get_state_int_id_dict(tree)
     for (k,vee) in tree
         for v in vee
             print(id_dict[k]," => ")
@@ -209,6 +210,24 @@ function get_goal_id(domain, problem, tree)
     end
     return id_dict[id]
 end
+
+function get_possible_goal_ids(domain, problem, tree)
+    id_dict = get_state_int_id_dict(tree)
+    goal = problem.goal
+    ids = []
+    id_to_obs = Dict()
+    for (k, vee) in tree
+        for v in vee
+            if satisfy(goal, v[5], domain)[1]
+                push!(ids, id_dict[k])
+                obs = [fact.args[1]  for fact in v[5].facts if fact.name == :inbag]
+                id_to_obs[id_dict[k]] = obs
+            end
+        end
+    end
+    return Set(ids), id_to_obs
+end
+ 
 
 function get_init_id(domain, problem, tree)
     id_dict = get_state_int_id_dict(tree)
@@ -246,8 +265,12 @@ function force_right_order(plan, iid)
     focus = first
     while length(ordered_plan) != length(plan)
         node = find_first_node(plan, focus[2])
-        push!(ordered_plan, node)
-        focus = node
+        if node != nothing
+            push!(ordered_plan, node)
+            focus = node
+        else
+            break
+        end
     end
     return ordered_plan
 end
@@ -260,6 +283,7 @@ function format_plan(tree, cartesian_indices, action_mapping, iid)
         push!(plan_edges, idx)
     end
     plan_edge_path = force_right_order(plan_edges, iid)
+    println(plan_edge_path)
     for ei in plan_edge_path
         push!(plan, action_mapping[ei])
     end
@@ -274,5 +298,5 @@ function draw_graph(tree)
     for pair in Edges
         add_edge!(causal_graph, pair[1], pair[2])
     end
-    gplot(causal_graph, nodelabel=nodelabels,layout=random_layout,  edgelabelc=colorant"orange", nodesize=10.0)
+    gplot(causal_graph, nodelabel=nodelabels,layout=shell_layout,  edgelabelc=colorant"orange", nodesize=10.0)
 end

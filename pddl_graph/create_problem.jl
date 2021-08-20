@@ -7,14 +7,31 @@ function create_grocery_problem(items, problem_name)
    prefix *= ")\n"
    prefix *= "(:init  "
    for ob in items
-       prefix *= "(on-table " * string(ob) * ") "
+       prefix *= "(ontable " * string(ob) * ") "
    end
    prefix *= ")\n"
-   prefix *= "(:goal (and "
+   # prefix *= "(:goal (and "
+   # for ob in items
+   #     prefix *= "(inbag "*string(ob)*") "
+   # end
+   # prefix *= ")))"
+
+   prefix *= "(:goal (or "
+   perms = []
    for ob in items
-       prefix *= "(in-bag "*string(ob)*") "
-   end
-   prefix *= ")))"
+        for ob2 in items
+            if ob!=ob2
+                dis = "(and (inbag "*string(ob)*") (inbag "*string(ob2)*"))"
+                dis2 = "(and (inbag "*string(ob2)*") (inbag "*string(ob)*"))"
+                if !(dis in perms) && !(dis2 in perms)
+                    push!(perms, dis)
+                    prefix *= dis*" "
+                end
+            end
+        end
+    end
+    prefix *=")))"
+
 
    open("pddl_graph/pddl/grocerypacking/"*problem_name*"_problem.pddl", "w") do io
        write(io, prefix)

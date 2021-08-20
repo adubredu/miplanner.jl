@@ -17,27 +17,46 @@ dom, prob = get_domain_problem_objects(domain_path, problem_path)
 tree = create_causal_graph_more(dom, prob, max_depth=10E5)
 pais, actions, action_mapping = get_edge_action_pairs_more(tree)
 gid = get_goal_id(dom, prob, tree)
-iid = get_init_id(dom, prob, tree)
+gids, goal_obs_dict = get_possible_goal_ids(dom, prob, tree)
+# goal_obs_dict = get_goal_id_obs(dom, prob, tree)
 
+println("gids: ",gids)
+iid = get_init_id(dom, prob, tree)
+println("init id: ",iid)
 G = create_adjacency_matrix(tree,pais)
+G[3,4]=10
+G[3,2]=10
+G[7,8]=-10
 
 
 
 println("Setting up optimization...")
 n = size(G)[1]
+not_goals = [i for i in 1:n if !(i in gids)]
+println("not goals: ", not_goals)
 println("Decision variable matrix size: ",size(G))
 shortest_path = Model(Gurobi.Optimizer)
 
 #plan variable
 @variable(shortest_path, x[1:n, 1:n], Bin)
+@variable(shortest_path, gr[1:n, 1:n])
 #object variable
 @variable(shortest_path, y[1:N], Bin)
 
 #task plan constraints
 @constraint(shortest_path, [i=1:n, j=1:n; G[i,j]==0], x[i,j]==0)
-@constraint(shortest_path, [i=1:n; i!=iid && i!=gid], sum(x[i,:])==sum(x[:,i]))
+@constraint(shortest_path, [i=1:n, j=1:n; G[i,j]==0], gr[i,j]==0.0)
+@constraint(shortest_path, [i=1:n; i!=iid && !(i in gids)], sum(x[i,:])==sum(x[:,i]))
 @constraint(shortest_path, sum(x[iid,:]) - sum(x[:,iid])==1)
-@constraint(shortest_path, sum(x[gid,:]) - sum(x[:,gid])==-1)
+for gi in gids
+    for oi in goal_obs_dict[gi]
+        # G[:,gi].*=Int(y[oi.name])*-10 
+        @constraint(shortest_path, [i=1:n], gr[i,gi] == y[oi.name]*-10)
+    end
+end
+# for ii in gids
+#     @constraint(shortest_path,  sum(x[ii,:]) - sum(x[:,ii])==-1)
+# end
 # @constraint(shortest_path, [i=1:n, j=1:n, k=1:N; y[k]==0])
 
  #=
@@ -65,7 +84,7 @@ end
 @constraint(shortest_path, weights' * y <= max_cpty)
 
 #shortest plan + largest num items objective function
-@objective(shortest_path, Min, LinearAlgebra.dot(G, x) - values' * y)
+@objective(shortest_path, Min, LinearAlgebra.dot(gr, x) - values' * y)
 # println(shortest_path)
 println("Optimizing...")
 
@@ -73,6 +92,7 @@ optimize!(shortest_path)
 
 solution = value.(x)
 cartesian_indices = findall(x->x==1, solution)
+println(value.(gr))
 plan = format_plan(tree, cartesian_indices, action_mapping, iid)
 # println("Plan: ",plan)
 
@@ -89,3 +109,5 @@ weights_packed = [weights[i] for i in items_to_pack]
 println("weights of items: ", weights_packed)
 println("sum weights: ", sum(weights_packed))
 draw_graph(tree)
+println("states of ids")
+print_id_to_state(tree)

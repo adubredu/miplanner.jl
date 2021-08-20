@@ -1,15 +1,15 @@
 (define (domain grocery)
 (:requirements :strips :equality)
-(:predicates (on-table ?x)
+(:predicates (ontable ?x)
              (arm-empty)
              (holding ?x)
-             (in-bag ?x))
+             (inbag ?x))
 
 
 
 (:action pack
  :parameters (?ob)
- :precondition (and (on-table ?ob) (not (in-bag ?ob)))
- :effect (and (in-bag ?ob) (not (on-table ?ob)))
+ :precondition (and (ontable ?ob) (not (inbag ?ob)))
+ :effect (and (inbag ?ob) (not (ontable ?ob)))
 
 ))
