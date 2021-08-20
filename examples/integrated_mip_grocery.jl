@@ -50,7 +50,7 @@ shortest_path = Model(Gurobi.Optimizer)
 @constraint(shortest_path, sum(x[iid,:]) - sum(x[:,iid])==1)
 for gi in gids
     for oi in goal_obs_dict[gi]
-        # G[:,gi].*=Int(y[oi.name])*-10 
+        # G[:,gi].*=Int(y[oi.name])*-10
         @constraint(shortest_path, [i=1:n], gr[i,gi] == y[oi.name]*-10)
     end
 end
@@ -104,7 +104,7 @@ for pa in plan
         push!(items_packed, obj)
     end
 end
-println(string(length(Set(items_packed)))*" items packed: ", Set(items_packed))
+println(string(length(Set(items_packed)))*" items packed:", Set(items_packed))
 weights_packed = [weights[i] for i in items_to_pack]
 println("weights of items: ", weights_packed)
 println("sum weights: ", sum(weights_packed))
