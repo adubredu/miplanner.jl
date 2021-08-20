@@ -227,7 +227,7 @@ function get_possible_goal_ids(domain, problem, tree)
     end
     return Set(ids), id_to_obs
 end
- 
+
 
 function get_init_id(domain, problem, tree)
     id_dict = get_state_int_id_dict(tree)
@@ -283,7 +283,7 @@ function format_plan(tree, cartesian_indices, action_mapping, iid)
         push!(plan_edges, idx)
     end
     plan_edge_path = force_right_order(plan_edges, iid)
-    println(plan_edge_path)
+    # println(plan_edge_path)
     for ei in plan_edge_path
         push!(plan, action_mapping[ei])
     end

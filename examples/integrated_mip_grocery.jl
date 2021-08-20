@@ -24,9 +24,9 @@ println("gids: ",gids)
 iid = get_init_id(dom, prob, tree)
 println("init id: ",iid)
 G = create_adjacency_matrix(tree,pais)
-G[3,4]=10
-G[3,2]=10
-G[7,8]=-10
+# G[3,4]=10
+# G[3,2]=10
+# G[7,8]=-10
 
 
 
@@ -46,6 +46,7 @@ shortest_path = Model(Gurobi.Optimizer)
 #task plan constraints
 @constraint(shortest_path, [i=1:n, j=1:n; G[i,j]==0], x[i,j]==0)
 @constraint(shortest_path, [i=1:n, j=1:n; G[i,j]==0], gr[i,j]==0.0)
+# @constraint(shortest_path, [i=1:n, j=1:n; G[i,j]==1], gr[i,j]==1.0)
 @constraint(shortest_path, [i=1:n; i!=iid && !(i in gids)], sum(x[i,:])==sum(x[:,i]))
 @constraint(shortest_path, sum(x[iid,:]) - sum(x[:,iid])==1)
 for gi in gids
@@ -92,7 +93,7 @@ optimize!(shortest_path)
 
 solution = value.(x)
 cartesian_indices = findall(x->x==1, solution)
-println(value.(gr))
+# println(value.(gr))
 plan = format_plan(tree, cartesian_indices, action_mapping, iid)
 # println("Plan: ",plan)
 
