@@ -68,15 +68,18 @@ function create_causal_graph_more(domain, problem; max_depth=10)
     tree[init_id] = [(init_id, init_state, nothing, init_id, init_state)]
 
     for i=1:max_depth
+        if length(queue) == 0
+            break
+        end
         node_id = popfirst!(queue)
         for node in tree[node_id]
             expand_more!(node, tree, queue, domain, problem)
-            if satisfy(problem.goal, node[5], domain)[1]
-                return tree
-            end
+            # if satisfy(problem.goal, node[5], domain)[1]
+            #     return tree
+            # end
         end
     end
-    return :Failure
+    return tree
 end
 
 function create_causal_graph(domain, problem; max_depth=10)
