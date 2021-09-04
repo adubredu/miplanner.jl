@@ -39,6 +39,7 @@ shortest_path = Model(Gurobi.Optimizer)
 
 #plan variable
 @variable(shortest_path, x[i=1:n, j=1:n], Bin)
+@variable(shortest_path, g, Int, start = gid)
 # @variable(shortest_path, gr[i=1:n, j=1:n], start = 0.0)
 #object variable
 @variable(shortest_path, y[1:N], Bin)

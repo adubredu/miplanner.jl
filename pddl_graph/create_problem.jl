@@ -13,11 +13,11 @@ function create_grocery_problem(items, problem_name)
    end
    prefix *= ")\n"
 
-   prefix *= "(:goal (and "
-   for ob in items
-       prefix *= "(inbag "*string(ob)*") "
-   end
-   prefix *= ")))"
+   # prefix *= "(:goal (and "
+   # for ob in items
+   #     prefix *= "(inbag "*string(ob)*") "
+   # end
+   # prefix *= ")))"
 
    # prefix *= "(:goal (or "
    # perms = []
@@ -35,18 +35,18 @@ function create_grocery_problem(items, problem_name)
    #  end
    #  prefix *=")))"
 
-    # prefix *= "(:goal (or "
-    # println("items: ", items)
-    # combos = combinations(items)
-    # for combo in combos
-    #     dis="(and "
-    #     for c in combo
-    #         dis*="(inbag "*string(c)*") "
-    #     end
-    #     dis*=") "
-    #     prefix*=dis*" "
-    # end
-    # prefix *=")))"
+    prefix *= "(:goal (or "
+    println("items: ", items)
+    combos = combinations(items)
+    for combo in combos
+        dis="(and "
+        for c in combo
+            dis*="(inbag "*string(c)*") "
+        end
+        dis*=") "
+        prefix*=dis*" "
+    end
+    prefix *=")))"
 
    open("pddl_graph/pddl/grocerypacking/"*problem_name*"_problem.pddl", "w") do io
        write(io, prefix)
